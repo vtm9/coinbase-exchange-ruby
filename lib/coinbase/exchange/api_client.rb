@@ -174,6 +174,20 @@ module Coinbase
       end
       alias sell ask
 
+      def market_order(size, params = {})
+        params[:product_id] ||= @default_product
+        params[:size] = size
+        params[:side] ||= "sell"
+        params[:type] = "market"
+
+        out = nil
+        post("/orders", params) do |resp|
+          out = response_object(resp)
+          yield(out, resp) if block_given?
+        end
+        out
+      end
+
       def cancel(id)
         out = nil
         delete("/orders/#{id}") do |resp|

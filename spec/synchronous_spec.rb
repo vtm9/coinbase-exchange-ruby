@@ -11,7 +11,6 @@ describe Coinbase::Exchange::Client do
     end
   end
 
-
   it "gets currencies" do
     stub_request(:get, /currencies/).to_return(body: mock_collection.to_json)
     @client.currencies do |out|
@@ -113,6 +112,26 @@ describe Coinbase::Exchange::Client do
       .with(body: hash_including('side' => 'sell'))
       .to_return(body: mock_item.to_json)
     @client.ask(10, 250) do |out|
+      expect(out.class).to eq(Coinbase::Exchange::APIObject)
+      expect(out['status']).to eq('OK')
+    end
+  end
+
+  it "places a sell market order" do
+    stub_request(:post, /orders/)
+      .with(body: hash_including('type' => 'market', 'side' => 'sell', 'size' => '0.001'))
+      .to_return(body: mock_item.to_json)
+    @client.market_order('0.001') do |out|
+      expect(out.class).to eq(Coinbase::Exchange::APIObject)
+      expect(out['status']).to eq('OK')
+    end
+  end
+
+  it "places a buy market order " do
+    stub_request(:post, /orders/)
+      .with(body: hash_including('type' => 'market', 'side' => 'buy', 'size' => '0.001'))
+      .to_return(body: mock_item.to_json)
+    @client.market_order('0.001', side: :buy) do |out|
       expect(out.class).to eq(Coinbase::Exchange::APIObject)
       expect(out['status']).to eq('OK')
     end
