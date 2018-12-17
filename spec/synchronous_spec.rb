@@ -11,15 +11,6 @@ describe Coinbase::Exchange::Client do
     end
   end
 
-  it "makes requests synchronously" do
-    stub_request(:get, /.*/).to_return(body: mock_collection.to_json)
-    success = true
-    EM.run do
-      @client.orders { EM.stop }
-      success = false
-    end
-    expect(success)
-  end
 
   it "gets currencies" do
     stub_request(:get, /currencies/).to_return(body: mock_collection.to_json)

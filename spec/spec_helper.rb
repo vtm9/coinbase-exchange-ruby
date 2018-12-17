@@ -1,6 +1,5 @@
 require 'bundler/setup'
 require 'webmock/rspec'
-require 'em-http'
 
 Bundler.setup
 
@@ -12,22 +11,22 @@ MARKET_REFS   = %i[currencies
                    last_trade
                    trade_history
                    price_history
-                   daily_stats].freeze
+                   daily_stats]
 
 ACCOUNT_REFS  = %i[accounts
                    account
                    account_history
-                   account_holds].freeze
+                   account_holds]
 
 ORDER_REFS    = %i[bid
                    ask
                    cancel
                    orders
                    order
-                   fills].freeze
+                   fills]
 
 TRANSFER_REFS = %i[deposit
-                   withdraw].freeze
+                   withdraw]
 
 def endpoints
   (MARKET_REFS << ACCOUNT_REFS << ORDER_REFS << TRANSFER_REFS).flatten!
