@@ -21,7 +21,8 @@ module Coinbase
           req_ts = Time.now.utc.to_i.to_s
           signature = Base64.encode64(
             OpenSSL::HMAC.digest('sha256', Base64.decode64(@api_secret).strip,
-                                 "#{req_ts}#{method}#{path}#{body}")).strip
+                                 "#{req_ts}#{method}#{path}#{body}")
+          ).strip
           headers = {}
           headers['Content-Type'] = 'application/json'
           headers['CB-ACCESS-TIMESTAMP'] = req_ts
@@ -42,21 +43,21 @@ module Coinbase
             req = EM::HttpRequest.new(@api_uri).post(path: path, head: headers, body: body, ssl: ssl_opts)
           when 'DELETE'
             req = EM::HttpRequest.new(@api_uri).delete(path: path, head: headers, ssl: ssl_opts)
-          else fail
+          else raise
           end
           req.callback do |resp|
             case resp.response_header.status
             when 200 then yield(EMHTTPResponse.new(resp))
-            when 400 then fail BadRequestError, resp.response
-            when 401 then fail NotAuthorizedError, resp.response
-            when 403 then fail ForbiddenError, resp.response
-            when 404 then fail NotFoundError, resp.response
-            when 429 then fail RateLimitError, resp.response
-            when 500 then fail InternalServerError, resp.response
+            when 400 then raise BadRequestError, resp.response
+            when 401 then raise NotAuthorizedError, resp.response
+            when 403 then raise ForbiddenError, resp.response
+            when 404 then raise NotFoundError, resp.response
+            when 429 then raise RateLimitError, resp.response
+            when 500 then raise InternalServerError, resp.response
             end
           end
           req.errback do |resp|
-            fail APIError, "#{method} #{@api_uri}#{path}: #{resp.error}"
+            raise APIError, "#{method} #{@api_uri}#{path}: #{resp.error}"
           end
         end
       end
@@ -70,7 +71,7 @@ module Coinbase
 
       def headers
         out = @response.response_header.map do |key, val|
-          [ key.upcase.gsub('_', '-'), val ]
+          [key.upcase.tr('_', '-'), val]
         end
         out.to_h
       end

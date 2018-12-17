@@ -6,28 +6,28 @@ Bundler.setup
 
 require 'coinbase/exchange'
 
-MARKET_REFS   = [ :currencies,
-                  :products,
-                  :orderbook,
-                  :last_trade,
-                  :trade_history,
-                  :price_history,
-                  :daily_stats ]
+MARKET_REFS   = %i[currencies
+                   products
+                   orderbook
+                   last_trade
+                   trade_history
+                   price_history
+                   daily_stats].freeze
 
-ACCOUNT_REFS  = [ :accounts,
-                  :account,
-                  :account_history,
-                  :account_holds ]
+ACCOUNT_REFS  = %i[accounts
+                   account
+                   account_history
+                   account_holds].freeze
 
-ORDER_REFS    = [ :bid,
-                  :ask,
-                  :cancel,
-                  :orders,
-                  :order,
-                  :fills ]
+ORDER_REFS    = %i[bid
+                   ask
+                   cancel
+                   orders
+                   order
+                   fills].freeze
 
-TRANSFER_REFS = [ :deposit,
-                  :withdraw ]
+TRANSFER_REFS = %i[deposit
+                   withdraw].freeze
 
 def endpoints
   (MARKET_REFS << ACCOUNT_REFS << ORDER_REFS << TRANSFER_REFS).flatten!
@@ -38,5 +38,5 @@ def mock_item
 end
 
 def mock_collection
-  [ mock_item, mock_item ]
+  [mock_item, mock_item]
 end

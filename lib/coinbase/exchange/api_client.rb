@@ -82,8 +82,7 @@ module Coinbase
                 'high' => item[2],
                 'open' => item[3],
                 'close' => item[4],
-                'volume' => item[5]
-              }
+                'volume' => item[5] }
             end
           )
           yield(out, resp) if block_given?
@@ -158,7 +157,7 @@ module Coinbase
         end
         out
       end
-      alias_method :buy, :bid
+      alias buy bid
 
       def ask(amt, price, params = {})
         params[:product_id] ||= @default_product
@@ -173,7 +172,7 @@ module Coinbase
         end
         out
       end
-      alias_method :sell, :ask
+      alias sell ask
 
       def cancel(id)
         out = nil
@@ -321,7 +320,7 @@ module Coinbase
         http_verb('DELETE', path) do |resp|
           begin
             out = JSON.parse(resp.body)
-          rescue
+          rescue StandardError
             out = resp.body
           end
           out.instance_eval { @response = resp }
@@ -331,15 +330,16 @@ module Coinbase
       end
 
       def http_verb(_method, _path, _body)
-        fail NotImplementedError
+        raise NotImplementedError
       end
 
       def self.whitelisted_certificates
         path = File.expand_path(File.join(File.dirname(__FILE__), 'ca-coinbase.crt'))
 
-        certs = [ [] ]
+        certs = [[]]
         File.readlines(path).each do |line|
           next if ["\n", "#"].include?(line[0])
+
           certs.last << line
           certs << [] if line == "-----END CERTIFICATE-----\n"
         end
@@ -348,6 +348,7 @@ module Coinbase
 
         certs.each do |lines|
           next if lines.empty?
+
           cert = OpenSSL::X509::Certificate.new(lines.join)
           result.add_cert(cert)
         end

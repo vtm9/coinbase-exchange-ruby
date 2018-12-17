@@ -14,15 +14,15 @@ module Coinbase
       end
 
       def body
-        fail NotImplementedError
+        raise NotImplementedError
       end
 
       def headers
-        fail NotImplementedError
+        raise NotImplementedError
       end
 
       def status
-        fail NotImplementedError
+        raise NotImplementedError
       end
     end
   end

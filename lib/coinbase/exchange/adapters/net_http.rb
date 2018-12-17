@@ -17,7 +17,7 @@ module Coinbase
         when 'GET' then req = Net::HTTP::Get.new(path)
         when 'POST' then req = Net::HTTP::Post.new(path)
         when 'DELETE' then req = Net::HTTP::Delete.new(path)
-        else fail
+        else raise
         end
 
         req.body = body
@@ -25,7 +25,8 @@ module Coinbase
         req_ts = Time.now.utc.to_i.to_s
         signature = Base64.encode64(
           OpenSSL::HMAC.digest('sha256', Base64.decode64(@api_secret).strip,
-                               "#{req_ts}#{method}#{path}#{body}")).strip
+                               "#{req_ts}#{method}#{path}#{body}")
+        ).strip
         req['Content-Type'] = 'application/json'
         req['CB-ACCESS-TIMESTAMP'] = req_ts
         req['CB-ACCESS-PASSPHRASE'] = @api_pass
@@ -35,12 +36,12 @@ module Coinbase
         resp = @conn.request(req)
         case resp.code
         when "200" then yield(NetHTTPResponse.new(resp))
-        when "400" then fail BadRequestError, resp.body
-        when "401" then fail NotAuthorizedError, resp.body
-        when "403" then fail ForbiddenError, resp.body
-        when "404" then fail NotFoundError, resp.body
-        when "429" then fail RateLimitError, resp.body
-        when "500" then fail InternalServerError, resp.body
+        when "400" then raise BadRequestError, resp.body
+        when "401" then raise NotAuthorizedError, resp.body
+        when "403" then raise ForbiddenError, resp.body
+        when "404" then raise NotFoundError, resp.body
+        when "429" then raise RateLimitError, resp.body
+        when "500" then raise InternalServerError, resp.body
         end
         resp.body
       end
@@ -54,7 +55,7 @@ module Coinbase
 
       def headers
         out = @response.to_hash.map do |key, val|
-          [ key.upcase.gsub('_', '-'), val.count == 1 ? val.first : val ]
+          [key.upcase.tr('_', '-'), val.count == 1 ? val.first : val]
         end
         out.to_h
       end

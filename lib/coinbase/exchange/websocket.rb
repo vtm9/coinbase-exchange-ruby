@@ -27,11 +27,11 @@ module Coinbase
       end
 
       def stop!
-        if @reactor_owner == true
-          @socket.onclose = ->(_event) { EM.stop }
-        else
-          @socket.onclose = ->(_event) { nil }
-        end
+        @socket.onclose = if @reactor_owner == true
+                            ->(_event) { EM.stop }
+                          else
+                            ->(_event) { nil }
+                          end
         @socket.close
       end
 
@@ -112,7 +112,7 @@ module Coinbase
       end
 
       def ws_error(event)
-        fail WebsocketError, event.data
+        raise WebsocketError, event.data
       end
     end
   end
