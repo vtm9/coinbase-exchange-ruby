@@ -117,21 +117,41 @@ describe Coinbase::Exchange::Client do
     end
   end
 
-  it "places a sell market order" do
+  it "places a sell market order with size" do
     stub_request(:post, /orders/)
       .with(body: hash_including('type' => 'market', 'side' => 'sell', 'size' => '0.001'))
       .to_return(body: mock_item.to_json)
-    @client.market_order('0.001') do |out|
+    @client.market_order(size: '0.001', side: :sell) do |out|
       expect(out.class).to eq(Coinbase::Exchange::APIObject)
       expect(out['status']).to eq('OK')
     end
   end
 
-  it "places a buy market order " do
+  it "places a buy market order with size" do
     stub_request(:post, /orders/)
       .with(body: hash_including('type' => 'market', 'side' => 'buy', 'size' => '0.001'))
       .to_return(body: mock_item.to_json)
-    @client.market_order('0.001', side: :buy) do |out|
+    @client.market_order(size: '0.001', side: :buy) do |out|
+      expect(out.class).to eq(Coinbase::Exchange::APIObject)
+      expect(out['status']).to eq('OK')
+    end
+  end
+
+  it "places a sell market order with funds" do
+    stub_request(:post, /orders/)
+      .with(body: hash_including('type' => 'market', 'side' => 'sell', 'funds' => '0.001'))
+      .to_return(body: mock_item.to_json)
+    @client.market_order(funds: '0.001', side: :sell) do |out|
+      expect(out.class).to eq(Coinbase::Exchange::APIObject)
+      expect(out['status']).to eq('OK')
+    end
+  end
+
+  it "places a buy market order with size" do
+    stub_request(:post, /orders/)
+      .with(body: hash_including('type' => 'market', 'side' => 'buy', 'funds' => '0.001'))
+      .to_return(body: mock_item.to_json)
+    @client.market_order(funds: '0.001', side: :buy) do |out|
       expect(out.class).to eq(Coinbase::Exchange::APIObject)
       expect(out['status']).to eq('OK')
     end

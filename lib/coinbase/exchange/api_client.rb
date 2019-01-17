@@ -174,10 +174,8 @@ module Coinbase
       end
       alias sell ask
 
-      def market_order(size, params = {})
+      def market_order(params = {})
         params[:product_id] ||= @default_product
-        params[:size] = size
-        params[:side] ||= "sell"
         params[:type] = "market"
 
         out = nil
